@@ -1,0 +1,40 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: flasky-mysql
+    hostname: mysql
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=flask
+
+  redis:
+    image: redis:3.2
+    container_name: flasky-redis
+    hostname: redis
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
+  flask:
+    depends_on:
+      - mysql
+      - redis
+    container_name: flasky-web
+    hostname: flask
+    build: .
+    stdin_open: true
+    tty: true
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flasky:/flask

@@ -1,0 +1,113 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Flasky</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('main.index') }}">首页</a></li>
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.user', username=current_user.username) }}">用户信息</a></li>
+                <li><a href="{{ url_for('main.my_post') }}">我的博客</a></li>
+                {% endif %}
+                {% if current_user.can(Permission.MODERATE_COMMENTS) %}
+                <li><a href="{{ url_for('main.moderate') }}">管理评论</a></li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <form class="navbar-form navbar-left" action="{{ url_for('main.search') }}" method="get">
+                        <div class="form-group">
+                            <input type="text" name="q" class="form-control" placeholder="请输入关键字">
+                        </div>
+                        <button type="submit" class="btn btn-default">查找</button>
+                    </form>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{{ current_user.gravatar(size=18) }}">
+                        账户({{current_user.username}}) <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('auth.change_password') }}">修改密码</a></li>
+                        <li><a href="{{ url_for('auth.change_email_request') }}">修改邮件账号</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">退出</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">登录</a></li>
+                <li><a href="{{ url_for('auth.register') }}">注册</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_jquery() }}
+    {{ moment.include_moment() }}
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<script>
+//修改提交按钮继承的类，按钮会变成蓝色
+    $("#submit").attr("class", "btn btn-info");
+    //修改提交按钮属性，上部外边界和宽度
+    $("#submit").css({
+        "width":"100%",
+        });
+</script>
+{% if current_user.is_authenticated %}
+<script type="text/javascript">
+$( document ).ready(function() {
+    function  hasOperate(callback, second) {
+
+        function countTime() {
+            setInterval(callback, second);
+        }
+        countTime();
+    }
+    function session_expiration_reminder() {
+        alert('你的session已过期,请注意保存当前页面的工作!!!');
+    }
+    hasOperate(session_expiration_reminder, 1000*60*31);
+});
+</script>
+{% endif %}
+<script src="http://cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js" type="text/javascript"></script>
+{% endblock %}

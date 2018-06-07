@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Search{% endblock %}
+
+{% block page_content %}
+<div class="post-tabs">
+{% include '_posts.html' %}
+</div>
+{% if posts %}
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'main.search',q=q) }}
+</div>
+{% endif %}
+{% else %}
+<h1 align="center">没有搜索结果</h1>
+{% endif %}
+{% endblock %}

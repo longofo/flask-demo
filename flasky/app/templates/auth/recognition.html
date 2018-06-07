@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block title %}Flasky - recognition{% endblock %}
+
+{% block page_content %}
+<div style="">
+    <h1 align="center">请输入验证码以继续</h1>
+</div>
+<div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+<script>
+
+    function create_verify_code()
+    {
+        var img = $('<img id="verify_img" src="{{ url_for('auth.get_verify_code', _external=True) }}" style="float:left;width:100px">');
+        $("#verification_code").css({width:'370px',float:'left'})
+        $("#verification_code").before($('<br>'))
+        $("#verification_code").after(img);
+        $("#verify_img").after($('<br>'))
+    }
+    //开始创建验证码图片
+    // if ({{ session['login_count'] }} >= 3){
+    //     create_verify_code();
+    // }
+    create_verify_code();
+    $(document).ready(function(){
+        //点击验证码刷新，主要采取重设src属性，属性每次都要不一样，所以在网址后面增加参数
+        $("img").click(function(){
+            var img_url = "{{ url_for('auth.get_verify_code', _external=True) }}?d=" + Math.random();
+            $(this).attr("src", img_url);
+        });
+    });
+</script>
+{% endblock %}
