@@ -3,10 +3,10 @@
 博客是根据*《Flask Web开发：基于Python的Web应用开发实战》*开发的,并在此基础上添加一些新功能功能和安全措施:
 * 添加了搜索功能
 * 添加了反爬虫措施
-	* User-Agent检测
-	* Referer检测
-	* ip请求频率过快封ip
-	* session请求频率过快封session
+    * User-Agent检测
+    * Referer检测
+    * ip请求频率过快封ip
+    * session请求频率过快封session
     * 验证码
 * 增加了某些页面或者需要访问更多页面必须登录的限制
 * 异地登录提醒
@@ -18,25 +18,31 @@
 
 ## 使用docker搭建
 
-Setp1:
-    安装docker
+### Setp1:
 
-Setp2:
-    git clone [https://github.com/wushilongwu/flask-demo.git](https://github.com/wushilongwu/flask-demo.git)
+安装docker
 
-Step3:
-    在项目根目录下运行:
-        docker-compose up -d
+### Setp2:
+
+git clone [https://github.com/wushilongwu/flask-demo.git](https://github.com/wushilongwu/flask-demo.git)
+
+### Step3:
+
+在项目根目录下运行:
+docker-compose up -d
         
-Step4:
-    使用docker-compose exec -it flask /bin/bash执行以下命令:
-        python manager.py db init
-        python manager.py db migrate -m "initial migration"
-        python manager.py db upgrade
-        python manager.py deploy
-        nohup /usr/bin/supervisord -c /etc/supervisord.conf > nohup.log 2>&1 &
-    *注*:这一步以后再修改,看官网说可以直接使用wait_for_it脚本
+### Step4:
 
+使用docker-compose exec -it flask /bin/bash执行以下命令:
+* python manager.py db init
+* python manager.py db migrate -m "initial migration"
+* python manager.py db upgrade
+* python manager.py deploy
+* nohup /usr/bin/supervisord -c /etc/supervisord.conf > nohup.log 2>&1 &
+
+*注*:这一步以后再修改,看官网说可以直接使用wait_for_it脚本
+
+### Step5:
 
 可以在主机上配置nginx作为反向代理,配置看手动搭建相关部分
 
