@@ -87,7 +87,7 @@ yum install MySQL-python
 ### 数据表E-R关系图及数据库的创建
 
 #### E-R图
-![](https://github.com/wushilongwu/flask-demo/blob/master/app/static/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1.png)
+![](https://github.com/wushilongwu/flask-demo/blob/master/flasky/app/static/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1.png)
 
 ### 数据库的创建
 
