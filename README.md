@@ -20,11 +20,14 @@
 
 Setp1:
     安装docker
+
 Setp2:
     git clone [https://github.com/wushilongwu/flask-demo.git](https://github.com/wushilongwu/flask-demo.git)
+
 Step3:
     在项目根目录下运行:
         docker-compose up -d
+        
 Step4:
     使用docker-compose exec -it flask /bin/bash执行以下命令:
         python manager.py db init
