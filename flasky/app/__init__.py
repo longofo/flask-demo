@@ -21,7 +21,7 @@ import redis
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
-db = SQLAlchemy()
+db = SQLAlchemy(use_native_unicode="utf8")
 pagedown = PageDown()
 
 login_manager = LoginManager()

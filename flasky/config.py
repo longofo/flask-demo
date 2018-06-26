@@ -10,7 +10,10 @@ import datetime
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True  # 每次请求结束后会自动db.session.commit()写入数据库
+
+    # 每次请求结束后会自动db.session.commit()写入数据库
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    # 如果设置成 True (默认情况)，Flask-SQLAlchemy 将会追踪对象的修改并且发送信号。这需要额外的内存， 如果不必要的可以禁用它。
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 邮箱配置信息
@@ -31,16 +34,23 @@ class Config:
     FLASKY_COMMENTS_PER_PAGE = int(os.environ.get(
         'FLASKY_COMMENTS_PER_PAGE')) or 20
 
-    SQLALCHEMY_RECORD_QUERIES = True  # 可以用于显式地禁用或者启用查询记录,在调试或者测试时可以开启
-    FLASKY_DB_QUERY_TIMEOUT = 0.5  # 查询超时的记录
+    # 可以用于显式地禁用或者启用查询记录,在调试或者测试时可以开启
+    SQLALCHEMY_RECORD_QUERIES = True
+
+    # 查询超时的记录
+    FLASKY_DB_QUERY_TIMEOUT = 0.5
     PROFILE = True
-    SSL_DISABLE = True  # 默认关闭SSL
+
+    # 默认关闭SSL
+    SSL_DISABLE = True
 
     # Session配置
     SESSION_TYPE = 'redis'
     SESSION_PERMANENT = False
+    # Whether sign the session cookie sid or not, if set to True, you have to set flask.Flask.secret_key, default to be False
     SESSION_USE_SIGNER = True
     SESSION_KEY_PREFIX = 'session:'
+    # the lifetime of a permanent session as datetime.timedelta object. Starting with Flask 0.8 this can also be an integer representing seconds.
     PERMANENT_SESSION_LIFETIME = datetime.timedelta(seconds=30 * 60)
     SESSION_STORAGE_HOST = os.environ.get(
         'SESSION_STORAGE_HOST') or 'localhost'

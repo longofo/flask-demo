@@ -31,6 +31,7 @@ class Permission:
 
 class Role(db.Model):
     __tablename__ = 'roles'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     # db.column类的构造函数第一个参数是数据库列和模型属性的类型,其他参数是对列的约束
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
@@ -68,6 +69,7 @@ class Role(db.Model):
 
 class Follow(db.Model):
     __tablename__ = 'follows'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     follower_id = db.Column(
         db.Integer, db.ForeignKey('users.id'), primary_key=True)
 
@@ -79,6 +81,7 @@ class Follow(db.Model):
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(64), unique=True, index=True)
@@ -107,6 +110,10 @@ class User(db.Model, UserMixin):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
 
     def __init__(self, **kwargs):
+        '''
+        User类的构造函数首先调用基类的构造函数,如果创建基类对象后还没有定义角色,
+        则根据电子邮件地址决定将其设定为管理员还是默认角色
+        '''
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.email == current_app.config['FLASKY_ADMIN']:
@@ -116,7 +123,6 @@ class User(db.Model, UserMixin):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
-        '''User类的构造函数首先调用基类的构造函数,如果创建基类对象后还没有定义角色,则根据电子邮件地址决定将其设定为管理员还是默认角色'''
 
     @property
     def password(self):
@@ -129,11 +135,16 @@ class User(db.Model, UserMixin):
 
     @property
     def followed_posts(self):
-        return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
-        # SqlAlchemy中filter,filter_by区别：
-        # * filter可以像写 sql 的 where 条件那样写 > <等条件，但引用列名时，需要通过 类名.属性名 的方式。filter还可以使用sqlalchemy提供的or_,and_,in_函数。比如：(1)Post.query.filter(or_(Post.id == 1,Post.id ==2,Post.id == 3))            (2)Post.query.filter(and_(Post.id == 1,Post.body.contain('sscs')))         (3)Post.query.filter(Post.id.in_([1,2,3]))
+        '''
+        SqlAlchemy中filter,filter_by区别：
+        * filter可以像写 sql 的 where 条件那样写 > <等条件，但引用列名时，需要通过 类名.属性名 的方式。filter还可以使用sqlalchemy提供的or_,and_,in_函数。比如：
+          (1)Post.query.filter(or_(Post.id == 1,Post.id ==2,Post.id == 3))
+          (2)Post.query.filter(and_(Post.id == 1,Post.body.contain('sscs')))
+          (3)Post.query.filter(Post.id.in_([1,2,3]))
 
-        # * filter_by可以使用python的正常参数传递方法传递条件，不需要额外指定类名。参数名对应类名中的属性名，但不能使用> <等条件
+        * filter_by可以使用python的正常参数传递方法传递条件，不需要额外指定类名。参数名对应类名中的属性名，但不能使用> <等条件
+        '''
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -297,6 +308,7 @@ class User(db.Model, UserMixin):
 
 class Post(db.Model):
     __tablename__ = 'posts'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -362,6 +374,7 @@ db.event.listen(Post.body, 'set', Post.on_changed_body)
 
 class Comment(db.Model):
     __tablename__ = 'comments'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
@@ -402,7 +415,9 @@ db.event.listen(Comment.body, 'set', Comment.on_changed_body)
 
 
 class AnonymousUser(AnonymousUserMixin):
-    '''这个类继承自Flask-login中的AnonymousUserMixin类,并将其设为用户未登录时current_user的值。这样程序不用先检查用户是否登录,就能自由调用current_user.can()和current_user.is_administrator()。
+    '''
+    这个类继承自Flask-login中的AnonymousUserMixin类,并将其设为用户未登录时current_user的值。
+    这样程序不用先检查用户是否登录,就能自由调用current_user.can()和current_user.is_administrator()。
     '''
 
     def can(self, permissions):
@@ -418,6 +433,7 @@ login_manager.anonymous_user = AnonymousUser
 @login_manager.user_loader
 def load_user(user_id):
     '''
-    Flask_login要求程序实现一个回调函数，使用指定的标识符加载用户。如果能找到用户，返回一个用户对象，否则返回None
+    Flask_login要求程序实现一个回调函数，使用指定的标识符加载用户。
+    如果能找到用户，返回一个用户对象，否则返回None
     '''
     return User.query.get(int(user_id))
