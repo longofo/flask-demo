@@ -28,11 +28,11 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = os.environ.get('FLASKY_ADMIN')
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    FLASKY_POSTS_PER_PAGE = int(os.environ.get('FLASKY_POSTS_PER_PAGE')) or 20
+    FLASKY_POSTS_PER_PAGE = int(os.environ.get('FLASKY_POSTS_PER_PAGE') or 20)
     FLASKY_FOLLOWERS_PER_PAGE = int(os.environ.get(
-        'FLASKY_FOLLOWERS_PER_PAGE')) or 20
+        'FLASKY_FOLLOWERS_PER_PAGE') or 20)
     FLASKY_COMMENTS_PER_PAGE = int(os.environ.get(
-        'FLASKY_COMMENTS_PER_PAGE')) or 20
+        'FLASKY_COMMENTS_PER_PAGE') or 20)
 
     # 可以用于显式地禁用或者启用查询记录,在调试或者测试时可以开启
     SQLALCHEMY_RECORD_QUERIES = True
