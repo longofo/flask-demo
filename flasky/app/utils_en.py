@@ -13,10 +13,8 @@ import requests
 from . import pool
 import redis
 
-# ----------------------------------------函数工具----------------------------------------------------------
 
-
-# ---------验证码------------
+# 验证码
 _letter_cases = "abcdefghjkmnpqrstuvwxy"  # 小写字母，去除可能干扰的i，l，o，z
 _upper_cases = _letter_cases.upper()  # 大写字母
 _numbers = ''.join(map(str, range(3, 10)))  # 数字
@@ -130,21 +128,24 @@ def generate_verification_code():
     return buf_str, str_text
 
 
-# -------------异地登录检测------------
+# 异地登录检测
 def check_remote_login(last_ip, current_ip):
-    inquire_api = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip={}'
+    # 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip={}' 新浪的不可用了
+    inquire_api = 'http://ip.taobao.com/service/getIpInfo.php?ip={}'
 
     if last_ip == current_ip:
         return None
 
     location = None
     try:
-        data = requests.get(inquire_api.format(last_ip)).json()
+        data = requests.get(inquire_api.format(last_ip), timeout=1).json()
         if not isinstance(data, dict):
             location = u'异常登录提醒: 您上次登录ip为{ip} 地点无法确定'.format(ip=last_ip)
         else:
+            data = data.get('data') or data
             country = data.get('country') if data.get('country') else ''
-            province = data.get('province') if data.get('province') else ''
+            province = data.get('province') or data.get('region') \
+                if data.get('province') or data.get('region') else ''
             city = data.get('city') if data.get('city') else ''
             if country or province or city:
                 location = u'异常登录提醒：你上次登录ip为{ip} 地点在 {country} {province} {city}'.format(
@@ -156,7 +157,7 @@ def check_remote_login(last_ip, current_ip):
         location = u'异常登录提醒: 您上次登录ip为{ip} 地点无法确定'.format(ip=last_ip)
     return location
 
-# ---------------------检测ip or session是否被锁------------------
+# 检测ip or session是否被锁
 
 
 def check_is_locked(ip, session):
@@ -167,7 +168,7 @@ def check_is_locked(ip, session):
     return False
 
 
-# ---------------------解除ip or session封禁 --------------------
+# 解除ip or session封禁
 def lift_ban(ip, session):
     r = redis.Redis(connection_pool=pool)
     r.delete('USER-BLOCK-{ip}'.format(ip=ip))

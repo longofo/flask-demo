@@ -106,6 +106,9 @@ def login():
     # if session['login_count'] <= 3:
     #     form = LoginForm()
     # else:
+    if current_user.is_authenticated:
+        return redirect(request.args.get('next') or url_for('main.index'))
+
     form = LoginImgCodeForm()
 
     if form.validate_on_submit():
