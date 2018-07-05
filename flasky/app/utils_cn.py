@@ -36,7 +36,7 @@ class RandomChar():
 class ImageChar():
     def __init__(self, fontColor=(0, 0, 0),
                  size=(100, 40),
-                 fontPath='Songti.ttc',
+                 fontPath='/usr/share/fonts/Songti.ttc',
                  bgColor=(255, 255, 255, 255),
                  fontSize=20):
         self.size = size
