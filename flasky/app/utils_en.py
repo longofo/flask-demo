@@ -173,3 +173,49 @@ def lift_ban(ip, session):
     r = redis.Redis(connection_pool=pool)
     r.delete('USER-BLOCK-{ip}'.format(ip=ip))
     r.delete('USER-BLOCK-{session}'.format(session=session))
+
+# 分页
+class Pagination(object):
+    def __init__(self, page, per_page, count):
+        self.page = page
+        self.prev_num = page - 1
+        self.next_num = page + 1
+        self.per_page = per_page
+
+        self.pages = int(count / self.per_page) + \
+            1 if count % self.per_page else int(
+                count / self.per_page)
+
+    @property
+    def has_prev(self):
+        return self.page > 1
+
+    @property
+    def has_next(self):
+        return self.page < self.pages
+
+    def iter_pages(self):
+        if self.page <= 5:
+            for p in range(1, self.page + 1):
+                yield p
+        else:
+            yield 1
+            yield 2
+
+        if self.page > 5:
+            yield '...'
+            yield self.page - 2
+            yield self.page - 1
+            yield self.page
+
+        if self.pages - self.page > 4:
+            yield self.page + 1
+            yield self.page + 2
+            yield '...'
+
+        if self.pages - self.page <= 4:
+            for p in range(self.page + 1, self.pages + 1):
+                yield p
+        else:
+            yield self.pages - 1
+            yield self.pages

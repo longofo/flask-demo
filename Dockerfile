@@ -6,15 +6,21 @@ RUN apt-get -y update && \
             apt-get -y install python-dev && \
             apt-get -y install supervisor && \
             apt-get -y install python-mysqldb && \
+            apt-get -y install mysql-client && \
             apt-get -y clean && \
             apt-get -y autoclean && \
             rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 WORKDIR /flask
 
 COPY ./flasky /flask
 
 COPY Songti.ttc /usr/share/fonts
+
+COPY docker-entrypoint.sh /usr/local/bin
+
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ADD supervisord.conf /etc/supervisord.conf
 
@@ -35,7 +41,7 @@ RUN pip install --upgrade pip && \
 # FLASK_CONFIG:配置环境,默认default(开发环境)
 ENV SECRET_KEY='hard to guess string' \
           MAIL_USERNAME='1320185818@qq.com' \
-          MAIL_PASSWORD='egqdxwpnsekpiigh' \
+          MAIL_PASSWORD='qdvbknfdbcnifghb' \
           FLASKY_ADMIN='1320185818@qq.com' \
           FLASKY_POSTS_PER_PAGE=20 \
           FLASKY_FOLLOWERS_PER_PAGE=20 \
@@ -43,6 +49,8 @@ ENV SECRET_KEY='hard to guess string' \
           SESSION_STORAGE_HOST='redis' \
           CELERY_BROKER_NAME='redis' \
           SITE_DOMAIN='120.77.202.221' \
-          DATABASE_URL='mysql://root:123456@mysql:3306/flask?charset=utf8' \
+          DATABASE_URL='mysql://root:123456@mysql:3306/flask?charset=utf8mb4' \
           FLASK_CONFIG='production' \
           C_FORCE_ROOT='true'
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

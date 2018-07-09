@@ -6,7 +6,7 @@
 # @Last Modified time: 2018-02-27 10:55:14
 
 
-from . import db
+from . import db, pool
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from . import login_manager
@@ -17,6 +17,7 @@ from markdown import markdown
 import bleach
 from datetime import datetime
 import hashlib
+import redis
 
 
 class Permission:
@@ -348,6 +349,24 @@ class Post(db.Model):
         #     tags=allowed_tags, attributes=attrs, styles=styles, strip=True))
         target.body_html = bleach.linkify(
             markdown(value, output_format='html'))
+
+    def inc_click(self):
+        r = redis.Redis(connection_pool=pool)
+        r.zincrby('flask-post-click-rank', self.id)
+
+    def delete_post_click(self):
+        r = redis.Redis(connection_pool=pool)
+        r.zrem('flask-post-click-rank', self.id)
+
+    @staticmethod
+    def get_click_top(page):
+        r = redis.Redis(connection_pool=pool)
+        per_page = current_app.config["FLASKY_POSTS_PER_PAGE"]
+        posts_id = r.zrevrange('flask-post-click-rank', (page - 1) *
+                               per_page, page * per_page, withscores=False, score_cast_func=int)
+        posts = [Post.query.get(int(id)) for id in posts_id]
+        count = r.zcard('flask-post-click-rank')
+        return posts, count
 
     def to_json(self):
         json_post = {

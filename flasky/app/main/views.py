@@ -17,6 +17,7 @@ from ..decorators import admin_required, permission_required
 from flask_sqlalchemy import get_debug_queries
 from sqlalchemy import or_
 import os
+from ..utils_en import Pagination
 
 
 @main.before_request
@@ -61,23 +62,33 @@ def index():
         db.session.commit()
         return redirect(url_for('main.index'))
     page = request.args.get('page', 1, type=int)
-    show_followed = False
-    if current_user.is_authenticated:
-        show_followed = bool(request.cookies.get('show_followed', ''))
-    if show_followed:
-        query = current_user.followed_posts.order_by(Post.timestamp.desc())
-    else:
+    show = request.cookies.get('show', 1, type=int)
+
+    if show in [2] and not current_user.is_authenticated or int(show) > 3 or int(show) < 1:
+        show = 1
+
+    # 为了分页显示记录,要把all()换成Flask-SQLAlchemy提供的paginate()方法。页数是paginate()方法的第一个参数，也是唯一必须的参数。可选参数per_page用来指定每一页显示的记录数量;没指定默认20个记录。error_out,当为True时(默认),如果请求页数超出范围,则会返回404错误;如果为False,超出时返回空列表。
+    # 这样修改之后,首页只会显示有限数量的文章。若想查看第二页,则要在浏览器地址中的url之后加上查询字符串?page=2
+    # 也可以使用自定义的分页
+
+    if show == 1:
         query = Post.query.order_by(Post.timestamp.desc())
-    pagination = query.paginate(
-        page=page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    '''
-    为了分页显示记录,要把all()换成Flask-SQLAlchemy提供的paginate()方法。页数是paginate()方法的第一个参数，也是唯一必须的参数。可选参数per_page用来指定每一页显示的记录数量;没指定默认20个记录。error_out,当为True时(默认),如果请求页数超出范围,则会返回404错误;如果为False,超出时返回空列表。
-    这样修改之后,首页只会显示有限数量的文章。若想查看第二页,则要在浏览器地址中的url之后加上查询字符串?page=2
-    '''
-    posts = pagination.items
+        pagination = query.paginate(
+            page=page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+        posts = pagination.items
+    elif show == 2:
+        query = current_user.followed_posts.order_by(Post.timestamp.desc())
+        pagination = query.paginate(
+            page=page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+        posts = pagination.items
+    elif show == 3:
+        posts, count = Post.get_click_top(page)
+        pagination = Pagination(
+            page=page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], count=count)
     return render_template('index.html', form=form, posts=posts,
-                           show_followed=show_followed, pagination=pagination)
+                           show=show, pagination=pagination)
 
 
 @main.route('/user/<username>')
@@ -140,6 +151,7 @@ def edit_profile_admin(id):
 @main.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
     post = Post.query.get_or_404(id)
+    post.inc_click()
     form = CommentForm()
     if form.validate_on_submit() and current_user.can(Permission.COMMENT):
         comment = Comment(body=form.body.data, post=post,
@@ -245,18 +257,25 @@ def followed_by(username):
                            follows=follows)
 
 
-@main.route('/all')
+@main.route('/post/all')
 def show_all():
     resp = make_response(redirect(url_for('main.index')))
-    resp.set_cookie('show_followed', '', max_age=30 * 24 * 60 * 60)
+    resp.set_cookie('show', '1', max_age=30 * 24 * 60 * 60)
     return resp
 
 
-@main.route('/followed')
+@main.route('/post/followed')
 @login_required
 def show_followed():
     resp = make_response(redirect(url_for('main.index')))
-    resp.set_cookie('show_followed', '1', max_age=30 * 24 * 60 * 60)
+    resp.set_cookie('show', '2', max_age=30 * 24 * 60 * 60)
+    return resp
+
+
+@main.route('/post/post_click_top')
+def post_click_top():
+    resp = make_response(redirect(url_for('main.index')))
+    resp.set_cookie('show', '3', max_age=30 * 24 * 60 * 60)
     return resp
 
 
@@ -347,6 +366,7 @@ def search():
 @login_required
 def delete_post(id):
     post = Post.query.get_or_404(id)
+    post.delete_post_click()
     if current_user != post.author and not current_user.is_administrator():
         abort(403)
     db.session.delete(post)

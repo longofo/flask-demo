@@ -64,7 +64,7 @@ def before_request():
 
 @auth.route('/HumanOrMachineRecognition', methods=['GET', 'POST'])
 def recognition():
-    if not check_is_locked(request.headers.get('X-Real-IP'), request.cookies.get('session')):
+    if not check_is_locked(request.headers.get('X-Real-IP') or request.remote_addr, request.cookies.get('session')):
         return redirect(url_for('main.index'))
     form = RecognitionForm()
     if form.validate_on_submit():

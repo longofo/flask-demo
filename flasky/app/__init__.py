@@ -10,6 +10,8 @@ from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.engine.url import make_url
+from sqlalchemy_utils import database_exists, create_database
 from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_session import Session
@@ -66,6 +68,18 @@ def create_app(config_name):
     app.logger.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     app.logger.addHandler(error_handler)
+
+    url = make_url(app.config['SQLALCHEMY_DATABASE_URI'])
+
+    if url.drivername.startswith('mysql'):
+        url.query['charset'] = 'utf8mb4'
+    # 如果数据库不存在则创建
+    if not database_exists(url):
+        if url.drivername.startswith('mysql'):
+            create_database(url, encoding='utf8mb4')
+        else:
+            create_database(url)
+    app.config['SQLALCHEMY_DATABASE_URI'] = str(url)
 
     # 插件初始化
     bootstrap.init_app(app)

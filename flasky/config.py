@@ -72,19 +72,19 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'mysql://root:123456@127.0.0.1:3306/test?charset=utf8'
+        'mysql://root:123456@127.0.0.1:3306/test?charset=utf8mb4'
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-        'mysql://root:123456@127.0.0.1:3306/test1?charset=utf8'
+        'mysql://root:123456@127.0.0.1:3306/test1?charset=utf8mb4'
 
 
 class ProductionConfig(Config):
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE')) or False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql://root:123456@127.0.0.1:3306/test?charset=utf8'  # 这里mysql数据库使用的和Dev里面是同一个,只是为了方便，因为在做Dev是里面有些数据，拿来测试用。可以设施为其他的
+        'mysql://root:123456@127.0.0.1:3306/test?charset=utf8mb4'  # 这里mysql数据库使用的和Dev里面是同一个,只是为了方便，因为在做Dev是里面有些数据，拿来测试用。可以设施为其他的
 
     @classmethod
     def init_app(cls, app):

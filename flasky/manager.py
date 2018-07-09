@@ -6,8 +6,7 @@
 # @Last Modified time: 2017-09-17 23:49:46
 
 
-# 在启动manager.py前,需要启动mysql,redis,消息队列服务
-# redis的启动方法：cd到redis目录下,执行redis-server redis.windows.conf
+# 在启动manager.py前,需要启动mysql,redis
 # 启动消息队列celery -A manager.celery worker --loglevel=info
 # 所有服务都准备好后,再启动manager.py
 
@@ -53,7 +52,7 @@ print('Hello!!!')
 
 import os
 from app import create_app, db, celery
-from app.models import User, Role
+from app.models import User, Role, Post
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -95,6 +94,7 @@ def deploy():
     User.add_self_follows()
     # 生成模拟用户
     User.generate_fake()
+    Post.generate_fake()
 
 
 def make_shell_context():
