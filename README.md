@@ -2,6 +2,7 @@
 
 博客是根据*《Flask Web开发：基于Python的Web应用开发实战》*开发的,并在此基础上添加一些新功能功能和安全措施:
 * 添加了搜索功能
+* 文章点击量排行功能
 * 添加了反爬虫措施
     * User-Agent检测
     * Referer检测
@@ -32,17 +33,6 @@ git clone [https://github.com/wushilongwu/flask-demo.git](https://github.com/wus
 docker-compose up -d
         
 ### Step4:
-
-使用docker-compose exec -it flask /bin/bash执行以下命令:
-* python manager.py db init
-* python manager.py db migrate -m "initial migration"
-* python manager.py db upgrade
-* python manager.py deploy
-* nohup /usr/bin/supervisord -c /etc/supervisord.conf > nohup.log 2>&1 &
-
-*注*:这一步以后再修改,看官网说可以直接使用wait_for_it脚本
-
-### Step5:
 
 可以在主机上配置nginx作为反向代理,配置看手动搭建相关部分
 
@@ -94,7 +84,8 @@ yum install MySQL-python
 * python manager.py db init  (创建迁移仓库)
 * python manager.py db migrate -m "initial migration"  (自动创建迁移脚本)
 * python manager.py db upgrade  (将更新应用到数据库)
-注：如果运行上诉三个命令出错，先删掉migrations文件夹
+* python manager.py deploy
+注：如果运行上诉四个命令出错，先删掉migrations文件夹
 
 ### 运行项目
 
