@@ -25,7 +25,11 @@
 
 ### Setp2:
 
-git clone [https://github.com/wushilongwu/flask-demo.git](https://github.com/wushilongwu/flask-demo.git)
+git clone [https://github.com/
+
+
+
+/flask-demo.git](https://github.com/longofo/flask-demo.git)
 
 ### Step3:
 
@@ -57,7 +61,7 @@ yum install MySQL-python
 
 ### Step2
 
-* git clone https://github.com/wushilongwu/flask-demo.git
+* git clone https://github.com/longofo/flask-demo.git
 * 切换到flasky目录下
 * 在项目requirements文件夹下 pip install -r prod.txt
 * 添加以下环境变量:
@@ -77,7 +81,7 @@ yum install MySQL-python
 ### 数据表E-R关系图及数据库的创建
 
 #### E-R图
-![](https://github.com/wushilongwu/flask-demo/blob/master/flasky/app/static/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1.png)
+![](https://github.com/longofo/flask-demo/blob/master/flasky/app/static/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1.png)
 
 ### 数据库的创建
 
