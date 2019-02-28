@@ -40,9 +40,9 @@ RUN pip install --upgrade pip && \
 # DATABASE_URL:数据库连接url,默认'mysql://root:123456@localhost:3306/flask?charset=utf8'
 # FLASK_CONFIG:配置环境,默认default(开发环境)
 ENV SECRET_KEY='hard to guess string' \
-          MAIL_USERNAME='1320185818@qq.com' \
-          MAIL_PASSWORD='qdvbknfdbcnifghb' \
-          FLASKY_ADMIN='1320185818@qq.com' \
+          MAIL_USERNAME='' \
+          MAIL_PASSWORD='' \
+          FLASKY_ADMIN='' \
           FLASKY_POSTS_PER_PAGE=20 \
           FLASKY_FOLLOWERS_PER_PAGE=20 \
           FLASKY_COMMENTS_PER_PAGE=20 \
